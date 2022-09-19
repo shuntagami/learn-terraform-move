@@ -14,7 +14,7 @@ data "aws_availability_zones" "available" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.14.0"
+  version = "3.14.4"
 
   name = var.vpc_name
   cidr = var.vpc_cidr
@@ -27,6 +27,11 @@ module "vpc" {
   map_public_ip_on_launch = true
 
   tags = var.vpc_tags
+}
+
+module "security_group" {
+  source = "./modules/security_group"
+  vpc_id    = module.vpc.vpc_id
 }
 
 data "aws_ami" "ubuntu" {
@@ -45,12 +50,11 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-
 resource "aws_instance" "example" {
   ami                         = data.aws_ami.ubuntu.id
   subnet_id                   = module.vpc.public_subnets[0]
   instance_type               = "t2.micro"
-  vpc_security_group_ids      = [aws_security_group.sg_8080.id]
+  vpc_security_group_ids      = [module.security_group.security_group_id]
   associate_public_ip_address = true
   
   user_data                   = <<-EOF
@@ -66,20 +70,3 @@ resource "aws_instance" "example" {
   }
 }
 
-resource "aws_security_group" "sg_8080" {
-  vpc_id = module.vpc.vpc_id
-  name   = "terraform-learn-move-sg"
-  ingress {
-    from_port   = "8080"
-    to_port     = "8080"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  // connectivity to ubuntu mirrors is required to run `apt-get update` and `apt-get install apache2`
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
