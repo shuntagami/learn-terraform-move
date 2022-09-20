@@ -31,7 +31,7 @@ module "vpc" {
 
 module "security_group" {
   source = "./modules/security_group"
-  vpc_id    = module.vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
 }
 
 data "aws_ami" "ubuntu" {
@@ -56,8 +56,8 @@ resource "aws_instance" "example" {
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [module.security_group.security_group_id]
   associate_public_ip_address = true
-  
-  user_data                   = <<-EOF
+
+  user_data = <<-EOF
               #!/bin/bash
               apt-get update
               apt-get install -y apache2
@@ -69,4 +69,3 @@ resource "aws_instance" "example" {
     Name = "terraform-learn-move-ec2"
   }
 }
-

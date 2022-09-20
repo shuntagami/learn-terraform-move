@@ -1,6 +1,6 @@
 resource "aws_security_group" "sg_8080" {
-  vpc_id      = var.vpc_id
-  name = "terraform-learn-move-sg"
+  vpc_id = var.vpc_id
+  name   = "terraform-learn-move-sg"
   ingress {
     from_port   = "8080"
     to_port     = "8080"
