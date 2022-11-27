@@ -1,6 +1,6 @@
 
 variable "region" {
-  default     = "us-east-2"
+  default     = "ap-northeast-1"
   description = "The AWS region your resources will be deployed"
 }
 
